@@ -7,12 +7,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// root route (for testing)
+// root route (Railway test)
 app.get("/", (req, res) => {
   res.send("Backend is working");
 });
 
-// status API (use this in Neocities)
+// status API (for Neocities frontend)
 app.get("/status", (req, res) => {
   res.json({
     server: "NEO MC",
@@ -20,11 +20,17 @@ app.get("/status", (req, res) => {
     players: 23,
     maxPlayers: 100,
     tps: 19.95,
-    version: "1.20.4"
+    version: "1.20.4",
+    lastUpdated: new Date().toISOString()
   });
 });
 
-// Railway REQUIRED port
+// health check (optional but good practice)
+app.get("/health", (req, res) => {
+  res.json({ ok: true });
+});
+
+// REQUIRED for Railway
 const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
