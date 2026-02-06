@@ -6,7 +6,7 @@ const app = express();
 app.use(cors());
 
 // CHANGE THIS
-const MC_HOST = "play.yourserver.com"; // or IP
+const MC_HOST = "play.chocomc.in"; // or IP
 const MC_PORT = 25565;
 
 app.get("/", (req, res) => {
