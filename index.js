@@ -1,38 +1,44 @@
 import express from "express";
 import cors from "cors";
+import { status } from "minecraft-server-util";
 
 const app = express();
-
-// middleware
 app.use(cors());
-app.use(express.json());
 
-// root route (Railway test)
+// CHANGE THIS
+const MC_HOST = "play.yourserver.com"; // or IP
+const MC_PORT = 25565;
+
 app.get("/", (req, res) => {
   res.send("Backend is working");
 });
 
-// status API (for Neocities frontend)
-app.get("/status", (req, res) => {
-  res.json({
-    server: "NEO MC",
-    online: true,
-    players: 23,
-    maxPlayers: 100,
-    tps: 19.95,
-    version: "1.20.4",
-    lastUpdated: new Date().toISOString()
-  });
+app.get("/status", async (req, res) => {
+  try {
+    const result = await status(MC_HOST, MC_PORT);
+
+    res.json({
+      online: true,
+      host: MC_HOST,
+      players: result.players.online,
+      maxPlayers: result.players.max,
+      playerList: result.players.sample
+        ? result.players.sample.map(p => p.name)
+        : [],
+      motd: result.motd.clean.join(" "),
+      version: result.version.name,
+      latency: result.roundTripLatency
+    });
+
+  } catch (err) {
+    res.json({
+      online: false,
+      error: "Server offline or unreachable"
+    });
+  }
 });
 
-// health check (optional but good practice)
-app.get("/health", (req, res) => {
-  res.json({ ok: true });
-});
-
-// REQUIRED for Railway
 const PORT = process.env.PORT;
-
 app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
+  console.log("Server running on", PORT);
 });
